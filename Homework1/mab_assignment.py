@@ -158,13 +158,22 @@ class UCB1(BaseAgent):
         self.c = c
         self.name = "UCB1" if c == 2.0 else f"UCB1 (c={c})"
         # TODO (Part A): add any attributes you need (e.g. a counter self.t)
+        self.t = 0
+
 
     def select_arm(self):
         # TODO (Part A): implement UCB1
         #  1. count this user (t)
         #  2. if some arm has never been shown, return it
         #  3. otherwise return the arm with the largest  mu_i + bonus_i
-        raise NotImplementedError("UCB1.select_arm() is not implemented yet")
+        ucb1 = np.zeros(self.k)
+        self.t += 1
+        for i in range(self.k):
+            if self.counts[i] == 0:
+                return i
+            ucb1[i] = self.values[i] + np.sqrt(self.c * np.log(self.t) / self.counts[i])
+        return np.argmax(ucb1)
+        #raise NotImplementedError("UCB1.select_arm() is not implemented yet")
 
 
 # ===============================================================
@@ -188,15 +197,22 @@ class ThompsonSampling(BaseAgent):
         super().__init__(k)
         self.rng = np.random.default_rng(seed)
         # TODO (Part A): create self.alpha and self.beta (all ones, length k)
+        self.alpha = np.ones(k)
+        self.beta = np.ones(k)
 
     def select_arm(self):
         # TODO (Part A): sample from each arm's Beta belief, return the argmax
-        raise NotImplementedError("ThompsonSampling.select_arm() is not implemented yet")
+        samples = self.rng.beta(self.alpha, self.beta)
+        return int(np.argmax(samples))
+        #raise NotImplementedError("ThompsonSampling.select_arm() is not implemented yet")
 
     def update(self, arm, reward):
         # TODO (Part A): call super().update(arm, reward),
         #                then update alpha and beta for this arm
-        raise NotImplementedError("ThompsonSampling.update() is not implemented yet")
+        super().update(arm, reward)
+        self.alpha[arm] += reward
+        self.beta[arm] += 1 - reward
+        #raise NotImplementedError("ThompsonSampling.update() is not implemented yet")
 
 
 # ===============================================================
@@ -213,10 +229,15 @@ class DecayingEpsilonGreedy(EpsilonGreedy):
         self.scale = scale
         self.name = f"Decaying eps ({scale}/sqrt t)"
         # TODO (C1)
+        self.t = 0
+        self.epsilon = 1.0
 
     def select_arm(self):
         # TODO (C1)
-        raise NotImplementedError("DecayingEpsilonGreedy is not implemented yet")
+        self.t += 1
+        self.epsilon = min(1, self.scale / np.sqrt(self.t))
+        return super().select_arm()
+        #raise NotImplementedError("DecayingEpsilonGreedy is not implemented yet")
 
 
 class DiscountedThompsonSampling(ThompsonSampling):
@@ -233,7 +254,12 @@ class DiscountedThompsonSampling(ThompsonSampling):
 
     def update(self, arm, reward):
         # TODO (C4)
-        raise NotImplementedError("DiscountedThompsonSampling is not implemented yet")
+        #  1. shrink all alpha and beta by gamma
+        #  2. call super().update(arm, reward) to update counts/values and alpha/beta for this arm
+        self.alpha = 1 + self.gamma * (self.alpha - 1)
+        self.beta = 1 + self.gamma * (self.beta - 1)
+        super().update(arm, reward)
+        #raise NotImplementedError("DiscountedThompsonSampling is not implemented yet")
 
 
 # ---------------------------------------------------------------
@@ -330,36 +356,36 @@ if __name__ == "__main__":
     # ---- PART C: your extension ----
     # Uncomment and adapt ONE of the templates below.
     # C1: decaying epsilon vs fixed epsilon
-    # compare(
-    #     [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
-    #      lambda s: DecayingEpsilonGreedy(K, scale=5.0, seed=s),
-    #      lambda s: ThompsonSampling(K, seed=s)],
-    #     TRUE_CTR, title="C1: decaying epsilon", filename="part_c1.png")
+    compare(
+        [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
+         lambda s: DecayingEpsilonGreedy(K, scale=5.0, seed=s),
+         lambda s: ThompsonSampling(K, seed=s)],
+        TRUE_CTR, title="C1: decaying epsilon", filename="part_c1.png")
 
     # C2: UCB1 exploration constant (no new class needed)
-    # compare(
-    #     [lambda s: UCB1(K, c=0.5), lambda s: UCB1(K, c=2.0), lambda s: UCB1(K, c=5.0)],
-    #     TRUE_CTR, title="C2: UCB1 constant", filename="part_c2.png")
+    compare(
+        [lambda s: UCB1(K, c=0.5), lambda s: UCB1(K, c=2.0), lambda s: UCB1(K, c=5.0)],
+        TRUE_CTR, title="C2: UCB1 constant", filename="part_c2.png")
 
     # C3: near-tie - set the runner-up to (best CTR - 0.002)
-    # near_tie = list(TRUE_CTR)
-    # order = np.argsort(near_tie)
-    # near_tie[order[-2]] = round(near_tie[order[-1]] - 0.002, 3)
-    # print("C3 near-tie CTRs:", near_tie)
-    # compare(
-    #     [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
-    #      lambda s: UCB1(K),
-    #      lambda s: ThompsonSampling(K, seed=s)],
-    #     near_tie, title="C3: near-tie", filename="part_c3.png")
+    near_tie = list(TRUE_CTR)
+    order = np.argsort(near_tie)
+    near_tie[order[-2]] = round(near_tie[order[-1]] - 0.002, 3)
+    print("C3 near-tie CTRs:", near_tie)
+    compare(
+        [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
+         lambda s: UCB1(K),
+         lambda s: ThompsonSampling(K, seed=s)],
+        near_tie, title="C3: near-tie", filename="part_c3.png")
 
     # C4: breaking news halfway through the day
-    # compare(
-    #     [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
-    #      lambda s: UCB1(K),
-    #      lambda s: ThompsonSampling(K, seed=s),
-    #      lambda s: DiscountedThompsonSampling(K, gamma=0.99, seed=s),
-    #      lambda s: DiscountedThompsonSampling(K, gamma=0.9995, seed=s)],
-    #     TRUE_CTR,
-    #     env_factory=lambda ctr, seed: BreakingNewsEnvironment(ctr, swap_at=10_000, seed=seed),
-    #     title="C4: breaking news at user 10,000", filename="part_c4.png")
-    pass
+    compare(
+        [lambda s: EpsilonGreedy(K, epsilon=0.1, seed=s),
+         lambda s: UCB1(K),
+         lambda s: ThompsonSampling(K, seed=s),
+         lambda s: DiscountedThompsonSampling(K, gamma=0.99, seed=s),
+         lambda s: DiscountedThompsonSampling(K, gamma=0.9995, seed=s)],
+        TRUE_CTR,
+        env_factory=lambda ctr, seed: BreakingNewsEnvironment(ctr, swap_at=10_000, seed=seed),
+        title="C4: breaking news at user 10,000", filename="part_c4.png")
+
