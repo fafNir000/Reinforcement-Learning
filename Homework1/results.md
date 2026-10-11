@@ -376,7 +376,3 @@ In a non-stationary environment, the parameter $\gamma$ controls the trade-off b
 * If $\gamma$ equals **1 (classic bandit)**, the algorithm becomes a rigid conservative, incapable of responding to changing trends.
 * A value of **$\gamma = 0.9995$** serves as the **"Goldilocks zone"** (optimal setting) for this task—allowing the algorithm to build reliable confidence while remaining flexible when environmental dynamics shift.
 
-## Part D: Recommendation
-
-> I would recommend Thompson Sampling for production because it achieved the best overall performance in our experiments. It had the lowest cumulative regret at 65.0, meaning that it lost the fewest expected clicks compared with always choosing the best headline. It also sent 90.1% of users to the best headline, compared with 81.4% for ε-Greedy, 36.5% for UCB1, and 16.7% for the uniform A/B test. This shows that Thompson Sampling was able to balance exploration and exploitation effectively: it continued to explore uncertain headlines while quickly concentrating traffic on the strongest one.
-However, this choice could fail if the audience or headline performance changes over time. For example, if a different headline suddenly becomes more attractive because of breaking news or a change in user interests, an algorithm based on historical observations may continue favouring the previously successful headline. In such a situation, the system would need a mechanism for adapting to changing click-through rates.
