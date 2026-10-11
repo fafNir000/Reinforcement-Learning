@@ -1,10 +1,16 @@
 # Results
 
 ## Contents
-* [Part A: Implement UCB1 and Thompson Sampling](#part-a-implement-ucb1-and-thompson-sampling)
-* [Part B: Compare the four strategies](#part-b-compare-the-four-strategies)
-* [Part C](#part-c)
-* [Part D: Recommendation](#part-d-recommendation)
+- [Overview](#overview)
+- [Setup](#setup)
+- [Part A: Implement UCB1 and Thompson Sampling](#part-a-implement-ucb1-and-thompson-sampling)
+- [Part B: Compare the four strategies](#part-b-compare-the-four-strategies)
+- [Part C](#part-c)
+- [Part C1 Decaying ε](#part-c1-decaying-ε)
+- [Part C2 UCB1 constant](#part-c2-ucb1-constant)
+- [Part C3 Near-tie](#part-c3-near-tie)
+- [Part C4 Breaking news](#part-c4-breaking-news)
+- [Part D: Recommendation](#part-d-recommendation)
 
 ## Overview
 
