@@ -1,5 +1,11 @@
 # Results
 
+## Содержание
+* [Part A: Implement UCB1 and Thompson Sampling](#part-a-implement-ucb1-and-thompson-sampling)
+* [Part B: Compare the four strategies](#part-b-compare-the-four-strategies)
+* [Part C](#part-c)
+* [Part D: Recommendation](#part-d-recommendation)
+
 ## Overview
 
 A news platform has 6 candidate headlines for one home-screen slot. Each visitor sees one headline and either clicks (reward 1) or not (reward 0). The goal is to collect as many clicks as possible, which is the same as minimising **cumulative regret**: the expected clicks lost by not always showing the best headline.
