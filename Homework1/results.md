@@ -1,6 +1,6 @@
 # Results
 
-## Содержание
+## Contents
 * [Part A: Implement UCB1 and Thompson Sampling](#part-a-implement-ucb1-and-thompson-sampling)
 * [Part B: Compare the four strategies](#part-b-compare-the-four-strategies)
 * [Part C](#part-c)
